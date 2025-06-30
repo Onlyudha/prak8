@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'composer:latest'
-        }
-    }
+    agent any
 
     stages {
         stage('Clone Repository') {
@@ -13,12 +9,12 @@ pipeline {
         }
         stage('Install Dependencies') {
             steps {
-                sh 'composer install'
+                sh 'docker run --rm -v $PWD:/app composer:2.5 install'
             }
         }
         stage('Run Unit Test') {
             steps {
-                sh './vendor/bin/phpunit tests'
+                sh 'docker run --rm -v $PWD:/app composer:2.5 ./vendor/bin/phpunit tests'
             }
             post {
                 success {
@@ -36,7 +32,9 @@ pipeline {
         }
         stage('Deploy Container') {
             steps {
-                sh 'docker run -d -p 8081:80 php-simple-app'
+                sh 'docker stop php-simple-app || true'
+                sh 'docker rm php-simple-app || true'
+                sh 'docker run -d -p 8081:80 --name php-simple-app php-simple-app'
             }
         }
     }
