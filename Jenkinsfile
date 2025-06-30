@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Onlyudha/prak8.git'
+                git branch: 'main', url: 'https://github.com/Onlyudha/prak8.git'
             }
         }
         stage('Install Dependencies') {
